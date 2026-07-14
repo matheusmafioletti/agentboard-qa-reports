@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentBoard QA Reports</title>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --accent: #5856d6;
+      --pass: #34c759;
+      --fail: #ff3b30;
+      --skip: #8e8e93;
+      --border: rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    header p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.875rem; }
+    main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      align-items: center;
+    }
+    .filters label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    select, input[type="date"] {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      background: var(--surface);
+    }
+    .stats {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .stat {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      min-width: 120px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .stat .label { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .stat .value { font-size: 1.5rem; font-weight: 600; margin-top: 0.25rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    th, td { padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; }
+    th {
+      background: rgba(88, 86, 214, 0.06);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    tr + tr td { border-top: 1px solid var(--border); }
+    tr:hover td { background: rgba(88, 86, 214, 0.03); }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge.pass { background: rgba(52, 199, 89, 0.15); color: var(--pass); }
+    .badge.fail { background: rgba(255, 59, 48, 0.15); color: var(--fail); }
+    .badge.skip { background: rgba(142, 142, 147, 0.15); color: var(--skip); }
+    .env-tag {
+      background: rgba(88, 86, 214, 0.12);
+      color: var(--accent);
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .empty {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+      background: var(--surface);
+      border-radius: 14px;
+    }
+    .error { color: var(--fail); padding: 1rem; background: rgba(255,59,48,0.08); border-radius: 10px; }
+    .links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .links a {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      background: rgba(88, 86, 214, 0.08);
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AgentBoard QA Reports</h1>
+    <p>Allure, Playwright, and Cypress report history</p>
+  </header>
+  <main>
+    <div class="filters">
+      <div>
+        <label for="env-filter">Environment</label><br />
+        <select id="env-filter">
+          <option value="">All</option>
+          <option value="pr-local">PR Local</option>
+          <option value="staging">Staging</option>
+        </select>
+      </div>
+      <div>
+        <label for="date-from">From</label><br />
+        <input type="date" id="date-from" />
+      </div>
+      <div>
+        <label for="date-to">To</label><br />
+        <input type="date" id="date-to" />
+      </div>
+      <div>
+        <label for="framework-filter">Framework</label><br />
+        <select id="framework-filter">
+          <option value="">All</option>
+          <option value="api">API</option>
+          <option value="e2e-playwright">Playwright</option>
+          <option value="e2e-cypress">Cypress</option>
+          <option value="e2e-selenium">Selenium</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div id="content"><p class="empty">Loading reports…</p></div>
+  </main>
+
+  <script>
+    let manifest = [];
+
+    async function loadManifest() {
+      const res = await fetch('manifest.json');
+      if (!res.ok) throw new Error('Failed to load manifest.json');
+      manifest = await res.json();
+      if (!Array.isArray(manifest)) manifest = [];
+      render();
+    }
+
+    function statusBadge(status) {
+      const cls = status === 'pass' ? 'pass' : status === 'fail' ? 'fail' : 'skip';
+      return `<span class="badge ${cls}">${status || 'unknown'}</span>`;
+    }
+
+    function filterRuns() {
+      const env = document.getElementById('env-filter').value;
+      const from = document.getElementById('date-from').value;
+      const to = document.getElementById('date-to').value;
+      const framework = document.getElementById('framework-filter').value;
+
+      return manifest.filter((run) => {
+        if (env && run.env !== env) return false;
+        if (from && run.timestamp < from) return false;
+        if (to && run.timestamp > to + 'T23:59:59Z') return false;
+        if (framework) {
+          const result = run.results?.[framework];
+          if (!result || result === 'skip') return false;
+        }
+        return true;
+      }).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    function renderStats(runs) {
+      const total = runs.length;
+      const passed = runs.filter((r) => Object.values(r.results || {}).every((v) => v !== 'fail')).length;
+      const failed = runs.filter((r) => Object.values(r.results || {}).some((v) => v === 'fail')).length;
+      document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="label">Runs</div><div class="value">${total}</div></div>
+        <div class="stat"><div class="label">All green</div><div class="value" style="color:var(--pass)">${passed}</div></div>
+        <div class="stat"><div class="label">With failures</div><div class="value" style="color:var(--fail)">${failed}</div></div>
+      `;
+    }
+
+    function renderLinks(links) {
+      if (!links) return '—';
+      return `<div class="links">${Object.entries(links).map(([k, v]) =>
+        `<a href="${v}">${k}</a>`
+      ).join('')}</div>`;
+    }
+
+    function render() {
+      const runs = filterRuns();
+      renderStats(runs);
+
+      if (runs.length === 0) {
+        document.getElementById('content').innerHTML = '<p class="empty">No reports match the current filters.</p>';
+        return;
+      }
+
+      const rows = runs.map((run) => {
+        const results = run.results || {};
+        const resultCells = ['api', 'e2e-playwright', 'e2e-cypress', 'e2e-selenium']
+          .map((k) => `<td>${statusBadge(results[k])}</td>`).join('');
+        const pr = run.pr ? `#${run.pr}` : '—';
+        const sha = run.sha ? run.sha.slice(0, 7) : '—';
+        return `<tr>
+          <td><code>${run.runId}</code></td>
+          <td>${new Date(run.timestamp).toLocaleString()}</td>
+          <td><span class="env-tag">${run.env}</span></td>
+          <td>${pr}</td>
+          <td><code>${sha}</code></td>
+          ${resultCells}
+          <td>${renderLinks(run.links)}</td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('content').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Run ID</th>
+              <th>Timestamp</th>
+              <th>Env</th>
+              <th>PR</th>
+              <th>SHA</th>
+              <th>API</th>
+              <th>Playwright</th>
+              <th>Cypress</th>
+              <th>Selenium</th>
+              <th>Links</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    ['env-filter', 'date-from', 'date-to', 'framework-filter'].forEach((id) => {
+      document.getElementById(id).addEventListener('change', render);
+    });
+
+    loadManifest().catch((err) => {
+      document.getElementById('content').innerHTML = `<p class="error">${err.message}</p>`;
+    });
+  </script>
+</body>
+</html>

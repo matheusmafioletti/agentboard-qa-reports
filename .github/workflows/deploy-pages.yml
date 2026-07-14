@@ -1,0 +1,50 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  bootstrap-gh-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Check if gh-pages exists
+        id: check
+        run: |
+          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bootstrap gh-pages branch
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout --orphan gh-pages
+          git rm -rf . 2>/dev/null || true
+
+          cp manifest.json /tmp/manifest.json 2>/dev/null || echo '[]' > /tmp/manifest.json
+          cp index.html /tmp/index.html
+
+          cp /tmp/manifest.json manifest.json
+          cp /tmp/index.html index.html
+          touch .nojekyll
+
+          git add manifest.json index.html .nojekyll
+          git commit -m "chore: bootstrap gh-pages for QA reports portal"
+          git push origin gh-pages
+
+      - name: gh-pages already exists
+        if: steps.check.outputs.exists == 'true'
+        run: echo "gh-pages branch already exists — skipping bootstrap."

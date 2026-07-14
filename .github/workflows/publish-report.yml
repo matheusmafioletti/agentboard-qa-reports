@@ -1,0 +1,235 @@
+name: Publish Report
+
+on:
+  workflow_call:
+    inputs:
+      run_id:
+        required: true
+        type: string
+      sha:
+        required: true
+        type: string
+      env:
+        required: true
+        type: string
+        description: pr-local or staging
+      pr_number:
+        required: false
+        type: string
+        default: ""
+      results_json:
+        required: true
+        type: string
+        description: JSON object with suite results and report paths
+      source_repo:
+        required: false
+        type: string
+        default: matheusmafioletti/agentboard-backend
+      source_run_id:
+        required: false
+        type: string
+        default: ""
+    secrets:
+      QA_REPORTS_PAT:
+        required: true
+      SOURCE_DOWNLOAD_TOKEN:
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse results JSON
+        id: meta
+        run: |
+          echo '${{ inputs.results_json }}' > /tmp/results.json
+          python3 - <<'PY'
+          import json, os
+          with open("/tmp/results.json") as f:
+              data = json.load(f)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"timestamp={data.get('timestamp', '')}\n")
+          PY
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          token: ${{ secrets.QA_REPORTS_PAT }}
+          fetch-depth: 0
+
+      - name: Install Allure CLI
+        run: |
+          curl -fsSL https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz -o /tmp/allure.tgz
+          sudo tar -xzf /tmp/allure.tgz -C /opt
+          sudo ln -sf /opt/allure-2.27.0/bin/allure /usr/local/bin/allure
+
+      - name: Prepare run directories
+        run: |
+          ENV="${{ inputs.env }}"
+          RUN_ID="${{ inputs.run_id }}"
+          mkdir -p "${ENV}/runs/${RUN_ID}"
+          mkdir -p "${ENV}/latest"
+
+      - name: Download source artifacts
+        if: inputs.source_run_id != ''
+        env:
+          GH_TOKEN: ${{ secrets.SOURCE_DOWNLOAD_TOKEN || secrets.QA_REPORTS_PAT }}
+        run: |
+          REPO="${{ inputs.source_repo }}"
+          RUN_ID="${{ inputs.source_run_id }}"
+          mkdir -p /tmp/artifacts
+
+          gh api "repos/${REPO}/actions/runs/${RUN_ID}/artifacts" --jq '.artifacts[].name' | while read -r name; do
+            URL=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}/artifacts" --jq ".artifacts[] | select(.name==\"${name}\") | .archive_download_url")
+            curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" "$URL" -o "/tmp/artifacts/${name}.zip"
+            unzip -qo "/tmp/artifacts/${name}.zip" -d "/tmp/artifacts/${name}" || true
+          done
+
+      - name: Generate Allure reports with history
+        run: |
+          ENV="${{ inputs.env }}"
+          RUN_ID="${{ inputs.run_id }}"
+          python3 - <<'PY'
+          import json, os, shutil, subprocess, glob
+
+          with open("/tmp/results.json") as f:
+              results = json.load(f)
+
+          env = os.environ["ENV"]
+          run_id = os.environ["RUN_ID"]
+          artifacts_root = "/tmp/artifacts"
+
+          allure_suites = {
+              "api": ["api-allure-results", "api-scoped-allure-results", "api-staging-allure-results"],
+              "e2e-playwright": ["playwright-allure-results", "playwright-staging-allure-results"],
+              "e2e-selenium": ["selenium-allure-results", "selenium-staging-allure-results"],
+          }
+
+          for suite, artifact_names in allure_suites.items():
+              src_dirs = []
+              for artifact_name in artifact_names:
+                  src_dirs.extend(glob.glob(f"{artifacts_root}/{artifact_name}/**/allure-results", recursive=True))
+                  if not src_dirs:
+                      src_dirs.extend(glob.glob(f"{artifacts_root}/{artifact_name}/target/allure-results", recursive=True))
+                  if not src_dirs:
+                      src_dirs.extend(glob.glob(f"{artifacts_root}/{artifact_name}/**", recursive=True))
+              if not src_dirs:
+                  continue
+
+              results_dir = f"/tmp/allure-work/{suite}/allure-results"
+              os.makedirs(results_dir, exist_ok=True)
+
+              for d in src_dirs:
+                  if os.path.isdir(d):
+                      for item in os.listdir(d):
+                          s = os.path.join(d, item)
+                          d_dest = os.path.join(results_dir, item)
+                          if os.path.isdir(s):
+                              shutil.copytree(s, d_dest, dirs_exist_ok=True)
+                          else:
+                              shutil.copy2(s, d_dest)
+
+              history_src = f"{env}/latest/{suite}/allure/history"
+              if os.path.isdir(history_src):
+                  shutil.copytree(history_src, f"{results_dir}/history", dirs_exist_ok=True)
+
+              report_out = f"/tmp/allure-report/{suite}"
+              subprocess.run(["allure", "generate", results_dir, "-o", report_out, "--clean"], check=True)
+
+              dest_run = f"{env}/runs/{run_id}/{suite}/allure"
+              dest_latest = f"{env}/latest/{suite}/allure"
+              shutil.copytree(report_out, dest_run, dirs_exist_ok=True)
+              shutil.copytree(report_out, dest_latest, dirs_exist_ok=True)
+
+          playwright_html = glob.glob(f"{artifacts_root}/playwright-report/**/index.html", recursive=True)
+          if not playwright_html:
+              playwright_html = glob.glob(f"{artifacts_root}/playwright-staging-report/**/index.html", recursive=True)
+          if playwright_html:
+              src = os.path.dirname(playwright_html[0])
+              for target in [f"{env}/runs/{run_id}/e2e/playwright/html", f"{env}/latest/e2e/playwright/html"]:
+                  os.makedirs(os.path.dirname(target), exist_ok=True)
+                  shutil.copytree(src, target, dirs_exist_ok=True)
+
+          cypress_names = ["cypress-mochawesome", "cypress-staging-mochawesome", "cypress-report"]
+          cypress_html = []
+          for name in cypress_names:
+              cypress_html.extend(glob.glob(f"{artifacts_root}/{name}/**/index.html", recursive=True))
+          cypress_html.extend(glob.glob(f"{artifacts_root}/cypress-report/**/index.html", recursive=True))
+          if cypress_html:
+              src = os.path.dirname(cypress_html[0])
+              for target in [f"{env}/runs/{run_id}/e2e/cypress/mochawesome", f"{env}/latest/e2e/cypress/mochawesome"]:
+                  os.makedirs(os.path.dirname(target), exist_ok=True)
+                  shutil.copytree(src, target, dirs_exist_ok=True)
+          PY
+        env:
+          ENV: ${{ inputs.env }}
+          RUN_ID: ${{ inputs.run_id }}
+
+      - name: Update manifest.json
+        run: |
+          python3 - <<'PY'
+          import json
+          from datetime import datetime, timezone
+
+          manifest_path = "manifest.json"
+          try:
+              with open(manifest_path) as f:
+                  manifest = json.load(f)
+          except (FileNotFoundError, json.JSONDecodeError):
+              manifest = []
+
+          with open("/tmp/results.json") as f:
+              payload = json.load(f)
+
+          env = "${{ inputs.env }}"
+          run_id = "${{ inputs.run_id }}"
+          base = f"{env}/runs/{run_id}"
+
+          entry = {
+              "runId": run_id,
+              "timestamp": payload.get("timestamp") or datetime.now(timezone.utc).isoformat(),
+              "env": env,
+              "sha": "${{ inputs.sha }}",
+              "pr": int("${{ inputs.pr_number }}") if "${{ inputs.pr_number }}" else None,
+              "results": payload.get("results", {}),
+              "links": {
+                  "api": f"{base}/api/allure/index.html",
+                  "playwright-allure": f"{base}/e2e-playwright/allure/index.html",
+                  "playwright-html": f"{base}/e2e/playwright/html/index.html",
+                  "cypress": f"{base}/e2e/cypress/mochawesome/index.html",
+                  "selenium": f"{base}/e2e-selenium/allure/index.html",
+              },
+          }
+
+          manifest = [e for e in manifest if e.get("runId") != run_id]
+          manifest.append(entry)
+          manifest.sort(key=lambda e: e.get("timestamp", ""), reverse=True)
+
+          with open(manifest_path, "w") as f:
+              json.dump(manifest, f, indent=2)
+              f.write("\n")
+          PY
+
+      - name: Copy dashboard to gh-pages root
+        run: |
+          git show main:index.html > index.html 2>/dev/null || true
+          if [[ ! -f index.html ]]; then
+            curl -fsSL "https://raw.githubusercontent.com/matheusmafioletti/agentboard-qa-reports/main/index.html" -o index.html || true
+          fi
+          touch .nojekyll
+
+      - name: Commit and push to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to publish."
+            exit 0
+          fi
+          git commit -m "publish: ${{ inputs.env }} run ${{ inputs.run_id }}"
+          git push origin gh-pages
