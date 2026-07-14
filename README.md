@@ -11,17 +11,37 @@ Central QA report portal for AgentBoard. Publishes Allure, Playwright HTML, and 
 
 ## Secrets
 
-| Secret | Where to configure | Purpose |
+| Secret | Onde configurar | Propósito |
 |---|---|---|
-| `QA_REPORTS_PAT` | `agentboard-backend` (and any caller) | Fine-grained PAT with `contents: write` on this repo — pushes to `gh-pages` |
-| `GITHUB_TOKEN` | This repo (automatic) | Used by `deploy-pages.yml` on first bootstrap |
+| `QA_REPORTS_PAT` | `agentboard-backend` | PAT com `contents: write` neste repo — push em `gh-pages` via `publish-report.yml` |
+| `GITHUB_TOKEN` | Este repo (automático) | Bootstrap inicial de `gh-pages` em `deploy-pages.yml` |
 
-### Creating `QA_REPORTS_PAT`
+### Criar `QA_REPORTS_PAT` (passo a passo)
 
-1. GitHub → Settings → Developer settings → Fine-grained personal access tokens.
-2. Repository access: `agentboard-qa-reports` only.
-3. Permissions: **Contents** → Read and write.
-4. Add the token as `QA_REPORTS_PAT` in `agentboard-backend` repository secrets.
+1. Acesse [Fine-grained tokens](https://github.com/settings/personal-access-tokens/new).
+2. **Token name:** `agentboard-qa-reports-publish`
+3. **Expiration:** 90 dias ou No expiration (portfolio — prefira rotacionar a cada 90 dias).
+4. **Repository access:** Only select repositories → `agentboard-qa-reports`
+5. **Permissions:**
+   - **Contents** → Read and write (obrigatório — push em `gh-pages`)
+   - **Metadata** → Read-only (padrão)
+6. Gere o token e copie **uma única vez** (não será exibido de novo).
+7. No repo **agentboard-backend**: Settings → Secrets and variables → Actions → **New repository secret**
+   - Name: `QA_REPORTS_PAT`
+   - Value: o token gerado
+
+> **Não** use classic PAT com escopo `repo` completo — fine-grained limita o acesso só a este repo.
+
+### Validar o secret
+
+Após o primeiro PR com pré-merge verde, confira em Actions do backend o job `publish-reports-pr`. Se falhar com `403` no push, o PAT não tem `contents: write` em `agentboard-qa-reports`.
+
+## Branch protection
+
+Ver [docs/branch-protection.md](docs/branch-protection.md). Resumo:
+
+- **`main`**: sem force-push/deleção
+- **`gh-pages`**: sem force-push/deleção, sem exigência de PR (publicação automática)
 
 ## Site structure
 
