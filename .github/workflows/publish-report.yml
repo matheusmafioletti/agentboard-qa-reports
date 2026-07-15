@@ -57,6 +57,7 @@ jobs:
       - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
+          repository: matheusmafioletti/agentboard-qa-reports
           ref: gh-pages
           token: ${{ secrets.QA_REPORTS_PAT }}
           fetch-depth: 0
