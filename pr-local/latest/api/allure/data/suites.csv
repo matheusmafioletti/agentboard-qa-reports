@@ -1,0 +1,94 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"failed","Wed Jul 15 13:40:07 UTC 2026","Wed Jul 15 13:40:07 UTC 2026","21","","Project Management","","Unauthenticated access returns 401","","Unauthenticated access returns 401","  As an authenticated tenant user
+  I want to manage projects
+  So that I can organize work items"
+"passed","Wed Jul 15 13:40:00 UTC 2026","Wed Jul 15 13:40:00 UTC 2026","192","","Tenant Management","","Creating a second tenant returns ADMIN role","","Creating a second tenant returns ADMIN role","  As an authenticated user
+  I want to create additional tenants
+  So that I can manage multiple workspaces"
+"passed","Wed Jul 15 13:40:03 UTC 2026","Wed Jul 15 13:40:03 UTC 2026","441","","Work Item Management","","Create TASK with USER_STORY parent","","Create TASK with USER_STORY parent","  As an authenticated board user
+  I want to create and manage work items
+  So that my team can track progress on the Kanban board"
+"passed","Wed Jul 15 13:40:04 UTC 2026","Wed Jul 15 13:40:04 UTC 2026","905","","Work Item Management","","Cross-tenant work item access returns 404","","Cross-tenant work item access returns 404","  As an authenticated board user
+  I want to create and manage work items
+  So that my team can track progress on the Kanban board"
+"passed","Wed Jul 15 13:40:02 UTC 2026","Wed Jul 15 13:40:03 UTC 2026","446","","Work Item Management","","Update work item status via PATCH","","Update work item status via PATCH","  As an authenticated board user
+  I want to create and manage work items
+  So that my team can track progress on the Kanban board"
+"passed","Wed Jul 15 13:40:04 UTC 2026","Wed Jul 15 13:40:05 UTC 2026","176","","Tenant Invites and Membership","","Admin creates invite with token","","Admin creates invite with token","  As a tenant admin
+  I want to invite and manage members
+  So that my team can collaborate on AgentBoard"
+"passed","Wed Jul 15 13:40:05 UTC 2026","Wed Jul 15 13:40:05 UTC 2026","179","","Tenant Invites and Membership","","Admin cancels pending invite","","Admin cancels pending invite","  As a tenant admin
+  I want to invite and manage members
+  So that my team can collaborate on AgentBoard"
+"passed","Wed Jul 15 13:40:05 UTC 2026","Wed Jul 15 13:40:05 UTC 2026","347","","Tenant Invites and Membership","","USER cannot create invite","","USER cannot create invite","  As a tenant admin
+  I want to invite and manage members
+  So that my team can collaborate on AgentBoard"
+"passed","Wed Jul 15 13:40:07 UTC 2026","Wed Jul 15 13:40:08 UTC 2026","548","","Project Management","","Cross-tenant project access returns 404","","Cross-tenant project access returns 404","  As an authenticated tenant user
+  I want to manage projects
+  So that I can organize work items"
+"passed","Wed Jul 15 13:39:59 UTC 2026","Wed Jul 15 13:39:59 UTC 2026","474","","User Login and Tenant Selection","","Multi-tenant login returns tenant selection payload","","Multi-tenant login returns tenant selection payload","  As a registered user
+  I want to authenticate and select a tenant
+  So that I can obtain a scoped JWT for AgentBoard"
+"passed","Wed Jul 15 13:40:00 UTC 2026","Wed Jul 15 13:40:00 UTC 2026","186","","User Registration","","Duplicate email registration returns 409","","Duplicate email registration returns 409","  As a new user
+  I want to register an account
+  So that I can access AgentBoard"
+"passed","Wed Jul 15 13:40:05 UTC 2026","Wed Jul 15 13:40:05 UTC 2026","310","","Tenant Invites and Membership","","New user accepts invite and becomes USER","","New user accepts invite and becomes USER","  As a tenant admin
+  I want to invite and manage members
+  So that my team can collaborate on AgentBoard"
+"passed","Wed Jul 15 13:40:06 UTC 2026","Wed Jul 15 13:40:06 UTC 2026","354","","Tenant Invites and Membership","","Admin revokes USER member","","Admin revokes USER member","  As a tenant admin
+  I want to invite and manage members
+  So that my team can collaborate on AgentBoard"
+"passed","Wed Jul 15 13:40:06 UTC 2026","Wed Jul 15 13:40:07 UTC 2026","276","","Project Management","","Authenticated user creates a project","","Authenticated user creates a project","  As an authenticated tenant user
+  I want to manage projects
+  So that I can organize work items"
+"passed","Wed Jul 15 13:40:00 UTC 2026","Wed Jul 15 13:40:00 UTC 2026","19","","User Registration","","Registration fails with invalid data","","Registration fails with invalid data","  As a new user
+  I want to register an account
+  So that I can access AgentBoard"
+"passed","Wed Jul 15 13:40:02 UTC 2026","Wed Jul 15 13:40:02 UTC 2026","342","","Work Item Management","","Create FEATURE returns 201 with status BACKLOG","","Create FEATURE returns 201 with status BACKLOG","  As an authenticated board user
+  I want to create and manage work items
+  So that my team can track progress on the Kanban board"
+"passed","Wed Jul 15 13:40:06 UTC 2026","Wed Jul 15 13:40:06 UTC 2026","13","","Tenant Invites and Membership","","Invalid invite token returns 410","","Invalid invite token returns 410","  As a tenant admin
+  I want to invite and manage members
+  So that my team can collaborate on AgentBoard"
+"passed","Wed Jul 15 13:40:00 UTC 2026","Wed Jul 15 13:40:00 UTC 2026","185","","User Login and Tenant Selection","","Invalid credentials return 401","","Invalid credentials return 401","  As a registered user
+  I want to authenticate and select a tenant
+  So that I can obtain a scoped JWT for AgentBoard"
+"passed","Wed Jul 15 13:40:07 UTC 2026","Wed Jul 15 13:40:07 UTC 2026","274","","Project Management","","List projects returns array for tenant","","List projects returns array for tenant","  As an authenticated tenant user
+  I want to manage projects
+  So that I can organize work items"
+"passed","Wed Jul 15 13:40:02 UTC 2026","Wed Jul 15 13:40:02 UTC 2026","378","","Work Item Management","","List work items returns 200","","List work items returns 200","  As an authenticated board user
+  I want to create and manage work items
+  So that my team can track progress on the Kanban board"
+"passed","Wed Jul 15 13:39:59 UTC 2026","Wed Jul 15 13:40:00 UTC 2026","369","","User Login and Tenant Selection","","Select-tenant returns token for chosen tenant","","Select-tenant returns token for chosen tenant","  As a registered user
+  I want to authenticate and select a tenant
+  So that I can obtain a scoped JWT for AgentBoard"
+"passed","Wed Jul 15 13:40:01 UTC 2026","Wed Jul 15 13:40:01 UTC 2026","412","","Work Item Management","","Create USER_STORY returns 201 with status READY","","Create USER_STORY returns 201 with status READY","  As an authenticated board user
+  I want to create and manage work items
+  So that my team can track progress on the Kanban board"
+"passed","Wed Jul 15 13:40:00 UTC 2026","Wed Jul 15 13:40:00 UTC 2026","47","","User Registration","","Registration fails with invalid data","","Registration fails with invalid data","  As a new user
+  I want to register an account
+  So that I can access AgentBoard"
+"passed","Wed Jul 15 13:40:00 UTC 2026","Wed Jul 15 13:40:01 UTC 2026","183","","Tenant Management","","Duplicate tenant name returns 409","","Duplicate tenant name returns 409","  As an authenticated user
+  I want to create additional tenants
+  So that I can manage multiple workspaces"
+"passed","Wed Jul 15 13:40:00 UTC 2026","Wed Jul 15 13:40:00 UTC 2026","32","","User Registration","","Registration fails with invalid data","","Registration fails with invalid data","  As a new user
+  I want to register an account
+  So that I can access AgentBoard"
+"passed","Wed Jul 15 13:40:05 UTC 2026","Wed Jul 15 13:40:06 UTC 2026","386","","Tenant Invites and Membership","","Existing user accepts invite without new tenant","","Existing user accepts invite without new tenant","  As a tenant admin
+  I want to invite and manage members
+  So that my team can collaborate on AgentBoard"
+"passed","Wed Jul 15 13:40:06 UTC 2026","Wed Jul 15 13:40:06 UTC 2026","176","","Tenant Invites and Membership","","Admin cannot revoke the only admin","","Admin cannot revoke the only admin","  As a tenant admin
+  I want to invite and manage members
+  So that my team can collaborate on AgentBoard"
+"passed","Wed Jul 15 13:40:03 UTC 2026","Wed Jul 15 13:40:04 UTC 2026","402","","Work Item Management","","Invalid hierarchy TASK parent of TASK returns 400","","Invalid hierarchy TASK parent of TASK returns 400","  As an authenticated board user
+  I want to create and manage work items
+  So that my team can track progress on the Kanban board"
+"passed","Wed Jul 15 13:39:56 UTC 2026","Wed Jul 15 13:39:59 UTC 2026","3070","","User Login and Tenant Selection","","Single-tenant login returns token directly","","Single-tenant login returns token directly","  As a registered user
+  I want to authenticate and select a tenant
+  So that I can obtain a scoped JWT for AgentBoard"
+"passed","Wed Jul 15 13:40:00 UTC 2026","Wed Jul 15 13:40:00 UTC 2026","147","","User Registration","","Valid registration returns token, ADMIN role and tenantId","","Valid registration returns token, ADMIN role and tenantId","  As a new user
+  I want to register an account
+  So that I can access AgentBoard"
+"passed","Wed Jul 15 13:40:01 UTC 2026","Wed Jul 15 13:40:01 UTC 2026","474","","Work Item Management","","Create TASK returns 201 with status NEW","","Create TASK returns 201 with status NEW","  As an authenticated board user
+  I want to create and manage work items
+  So that my team can track progress on the Kanban board"

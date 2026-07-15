@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "runId": "backend-pr-2-2a96ba7",
+    "timestamp": "2026-07-15T13:45:01Z",
+    "env": "pr-local",
+    "sha": "2a96ba7949bbc4335245c5be6c0d7dd7a038217e",
+    "pr": 2,
+    "results": {
+      "api": "fail",
+      "e2e-playwright": "fail",
+      "e2e-cypress": "fail",
+      "e2e-selenium": "pass"
+    },
+    "links": {
+      "api": "pr-local/runs/backend-pr-2-2a96ba7/api/allure/index.html",
+      "playwright-allure": "pr-local/runs/backend-pr-2-2a96ba7/e2e-playwright/allure/index.html",
+      "playwright-html": "pr-local/runs/backend-pr-2-2a96ba7/e2e/playwright/html/index.html",
+      "cypress": "pr-local/runs/backend-pr-2-2a96ba7/e2e/cypress/mochawesome/index.html",
+      "selenium": "pr-local/runs/backend-pr-2-2a96ba7/e2e-selenium/allure/index.html"
+    }
+  }
+]
