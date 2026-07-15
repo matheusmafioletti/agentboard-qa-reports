@@ -217,9 +217,15 @@ jobs:
 
       - name: Copy dashboard to gh-pages root
         run: |
-          git show main:index.html > index.html 2>/dev/null || true
-          if [[ ! -f index.html ]]; then
-            curl -fsSL "https://raw.githubusercontent.com/matheusmafioletti/agentboard-qa-reports/main/index.html" -o index.html || true
+          # IMPORTANT: never redirect git show straight to index.html — a failed show leaves a zero-byte file
+          git fetch origin main --depth=1
+          if git show origin/main:index.html > /tmp/dashboard-index.html 2>/dev/null && [[ -s /tmp/dashboard-index.html ]]; then
+            cp /tmp/dashboard-index.html index.html
+          elif curl -fsSL "https://raw.githubusercontent.com/matheusmafioletti/agentboard-qa-reports/main/index.html" -o /tmp/dashboard-index.html && [[ -s /tmp/dashboard-index.html ]]; then
+            cp /tmp/dashboard-index.html index.html
+          elif [[ ! -s index.html ]]; then
+            echo "ERROR: could not obtain dashboard index.html" >&2
+            exit 1
           fi
           touch .nojekyll
 
