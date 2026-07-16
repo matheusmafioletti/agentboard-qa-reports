@@ -1,5 +1,24 @@
 [
   {
+    "runId": "web-pr-2-248efd8",
+    "timestamp": "2026-07-16T17:39:31Z",
+    "env": "pr-local",
+    "sha": "248efd85f7ab0c07fd8251b6fef03a06eba5d5a1",
+    "pr": 2,
+    "results": {
+      "e2e-playwright": "pass",
+      "e2e-cypress": "pass",
+      "e2e-selenium": "pass"
+    },
+    "links": {
+      "api": "pr-local/runs/web-pr-2-248efd8/api/allure/index.html",
+      "playwright-allure": "pr-local/runs/web-pr-2-248efd8/e2e-playwright/allure/index.html",
+      "playwright-html": "pr-local/runs/web-pr-2-248efd8/e2e/playwright/html/index.html",
+      "cypress": "pr-local/runs/web-pr-2-248efd8/e2e/cypress/mochawesome/index.html",
+      "selenium": "pr-local/runs/web-pr-2-248efd8/e2e-selenium/allure/index.html"
+    }
+  },
+  {
     "runId": "web-pr-1-961ddd5",
     "timestamp": "2026-07-16T17:14:45Z",
     "env": "pr-local",
